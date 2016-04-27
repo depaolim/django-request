@@ -177,6 +177,14 @@ class RequestQuerySetTest(TestCase):
         qs = Request.objects.all().this_month()
         self.assertEqual(1, qs.count())
 
+    def test_this_week_today(self):
+        # setUp
+        request = Request.objects.create(ip='1.2.3.4')
+        request.save()
+        # Test
+        qs = Request.objects.all().this_week()
+        self.assertEqual(1, qs.count())
+
     def test_this_week(self):
         # setUp
         request = Request.objects.create(ip='1.2.3.4')
