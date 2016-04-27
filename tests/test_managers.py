@@ -4,6 +4,7 @@ from datetime import date, timedelta
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils.timezone import now
+import mock
 from request import settings
 from request.managers import QUERYSET_PROXY_METHODS, RequestQuerySet
 from request.models import Request
@@ -177,14 +178,6 @@ class RequestQuerySetTest(TestCase):
         qs = Request.objects.all().this_month()
         self.assertEqual(1, qs.count())
 
-    def test_this_week_today(self):
-        # setUp
-        request = Request.objects.create(ip='1.2.3.4')
-        request.save()
-        # Test
-        qs = Request.objects.all().this_week()
-        self.assertEqual(1, qs.count())
-
     def test_this_week(self):
         # setUp
         request = Request.objects.create(ip='1.2.3.4')
@@ -208,3 +201,21 @@ class RequestQuerySetTest(TestCase):
 
     def test_search(self):
         Request.objects.all().search()
+
+
+class NewDate(date):
+    @classmethod
+    def today(cls):
+        return date(2016, 4, 27)
+
+
+class RequestQuerySetWeekTest(TestCase):
+    def setUp(self):
+        self.request = Request.objects.create(ip='1.2.3.4')
+        self.request.time = NewDate.today()
+        self.request.save()
+
+    @mock.patch("request.managers.datetime.date", NewDate)
+    def test_this_week_today(self):
+        qs = Request.objects.all().this_week()
+        self.assertEqual(1, qs.count())
