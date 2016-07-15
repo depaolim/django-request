@@ -39,7 +39,7 @@ class RequestTests(TestCase):
         http_request.user = User.objects.create(username='foo')
 
         request = Request()
-        request.from_http_request(http_request)
+        request.from_http_request(http_request, commit=False)
         self.assertEqual(request.user.id, http_request.user.id)
 
     def test_from_http_request_redirection(self):
@@ -49,7 +49,7 @@ class RequestTests(TestCase):
         http_response['Location'] = '/foo'
 
         request = Request()
-        request.from_http_request(http_request, http_response)
+        request.from_http_request(http_request, http_response, commit=False)
         self.assertEqual(request.redirect, '/foo')
 
     def test_from_http_request_not_commit(self):
@@ -99,21 +99,21 @@ class RequestTests(TestCase):
         request = Request(ip='1.2.3.4')
         request.save()
 
-    @mock.patch('request.models.request_settings.REQUEST_LOG_IP',
+    @mock.patch('request.models.request_settings.LOG_IP',
                 False)
     def test_save_not_log_ip(self):
         request = Request(ip='1.2.3.4')
         request.save()
-        self.assertEqual(settings.REQUEST_IP_DUMMY, request.ip)
+        self.assertEqual(settings.IP_DUMMY, request.ip)
 
-    @mock.patch('request.models.request_settings.REQUEST_ANONYMOUS_IP',
+    @mock.patch('request.models.request_settings.ANONYMOUS_IP',
                 True)
     def test_save_anonymous_ip(self):
         request = Request(ip='1.2.3.4')
         request.save()
         self.assertTrue(request.ip.endswith('.1'))
 
-    @mock.patch('request.models.request_settings.REQUEST_LOG_USER',
+    @mock.patch('request.models.request_settings.LOG_USER',
                 False)
     def test_save_not_log_user(self):
         user = User.objects.create(username='foo')

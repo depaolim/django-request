@@ -178,6 +178,10 @@ class RequestQuerySetTest(TestCase):
         qs = Request.objects.all().this_month()
         self.assertEqual(1, qs.count())
 
+    def test_this_week_today(self):
+        qs = Request.objects.all().this_week()
+        self.assertEqual(1, qs.count())
+
     def test_this_week(self):
         # setUp
         request = Request.objects.create(ip='1.2.3.4')
@@ -190,7 +194,7 @@ class RequestQuerySetTest(TestCase):
 
     def test_unique_visits(self):
         # setUp
-        Request.objects.create(ip='1.2.3.4', referer=settings.REQUEST_BASE_URL)
+        Request.objects.create(ip='1.2.3.4', referer=settings.BASE_URL)
         # Test
         qs = Request.objects.all().unique_visits()
         self.assertEqual(1, qs.count())
