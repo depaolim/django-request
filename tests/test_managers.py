@@ -203,7 +203,7 @@ class RequestQuerySetTest(TestCase):
         Request.objects.all().search()
 
 
-class NewDate(date):
+class MockDate(date):
     @classmethod
     def today(cls):
         return date(2016, 4, 27)
@@ -212,10 +212,10 @@ class NewDate(date):
 class RequestQuerySetWeekTest(TestCase):
     def setUp(self):
         self.request = Request.objects.create(ip='1.2.3.4')
-        self.request.time = NewDate.today()
+        self.request.time = MockDate.today()
         self.request.save()
 
-    @mock.patch("request.managers.datetime.date", NewDate)
+    @mock.patch("request.managers.datetime.date", MockDate)
     def test_this_week_today(self):
         qs = Request.objects.all().this_week()
         self.assertEqual(1, qs.count())
